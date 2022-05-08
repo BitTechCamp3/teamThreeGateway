@@ -1,2 +1,27 @@
 server:
   port: 8080
+
+
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: http://localhost:8082/
+          predicates:
+            - Path=/user/login,/user/join
+
+        - id: board-service
+          uri: http://localhost:8084/
+          predicates:
+            - Path=/boards/qna,/boards/community,/board/id/**
+
+        - id: board-login-service
+          uri: http://localhost:8084/
+          predicates:
+            - Path=/board/addReply,/board/addLike(dislike),/board/dislike,/board/hide,/board/hide
+          filters:
+            - JwtTokenFilter
