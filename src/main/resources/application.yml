@@ -37,3 +37,6 @@ spring:
               - Path=/coin/update,/coin/update,/coin/update
           filters:
               - JwtTokenFilter
+
+jwt:
+  secret: dGVhbTNmaWdodGluZw== #team3fighting BASE64

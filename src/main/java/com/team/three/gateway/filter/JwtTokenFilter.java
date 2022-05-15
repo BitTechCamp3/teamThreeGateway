@@ -1,5 +1,7 @@
 package com.team.three.gateway.filter;
 
+import com.team.three.gateway.domain.Member;
+import com.team.three.gateway.jwt.TokenValidate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -7,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
@@ -37,10 +41,24 @@ public class JwtTokenFilter extends AbstractGatewayFilterFactory<JwtTokenFilter.
             List<String> token = request.getHeaders().get("token");
             String tokenString = Objects.requireNonNull(token).get(0);
 
+            TokenValidate tv = new TokenValidate();
+            Member member = tv.getMemebrId(tokenString);
 
-            // 토큰이 일치할 때
-            return chain.filter(exchange);
+            //토큰 일치
+            if(member.getResult() == 0) {
+                return chain.filter(exchange).then(Mono.fromRunnable(() -> log.info(">>>>>>>>토큰 있음, 로그인 가능>>>>>>>>")));
+            } else {
+                return handleUnAuthorized(exchange);
+            }
+
         });
+    }
+
+    private Mono<Void> handleUnAuthorized(ServerWebExchange exchange) {
+        ServerHttpResponse response = exchange.getResponse();
+
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        return response.setComplete();
     }
 
     public static class Config {
