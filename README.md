@@ -1,1 +1,5 @@
-# teamThreeGateway
+# 3조 - 
+
+|기능|메소드|도메인|API|
+|------|----|---|--------------|
+|회원가입|POST|USER|/user/join|
